@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b1d">
+  <title>Operation: Valhalla Journey</title>
+  <link rel="stylesheet" href="style/style.css">
+  <!-- three.js r128 (classic build, works from file://). For offline play, download it and point src at vendor/three.min.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script defer src="app/models.js"></script>
+  <script defer src="app/world.js"></script>
+  <script defer src="app/cinematics.js"></script>
+  <script defer src="app/app.js"></script>
+</head>
+<body class="on-landing">
+  <section id="landing" class="landing" aria-label="Game main menu">
+    <canvas id="landing-canvas" class="landing-canvas" aria-hidden="true"></canvas>
+    <div class="landing-content" id="landing-content">
+      <span class="eyebrow">UNITED EARTH / DEEP SPACE PROGRAM / 2086</span>
+      <p class="landing-operation">OPERATION</p>
+      <h1>VALHALLA<span>JOURNEY</span></h1>
+      <p class="landing-tagline">One astronaut. Fifteen days.<br>A whole world to bring home.</p>
+      <div class="landing-actions">
+        <button id="resume-button" class="button" hidden>Resume mission →</button>
+        <button id="start-button" class="button">Start mission →</button>
+        <button id="about-button" class="button quiet">About the mission</button>
+        <button id="quit-button" class="button quiet">Quit</button>
+      </div>
+      <div class="landing-chapters"><span><b>01–09</b>THE CROSSING</span><span><b>10</b>FIRST CONTACT</span><span><b>11–15</b>THE WAY HOME</span></div>
+      <small>WASD / ARROWS TO MOVE · HOLD E TO INTERACT<br>HEADPHONES OPTIONAL. COURAGE REQUIRED.</small>
+    </div>
+    <div id="quit-screen" class="quit-screen" hidden><span class="eyebrow">ASTRID / STANDBY</span><h2>Until next time,<br>astronaut.</h2><p>The game is stopped. You can close this tab.<br>Your current mission is available until you reload.</p><button id="back-menu-button" class="button">Return to menu</button></div>
+  </section>
+  <div class="app-shell" id="game-shell" hidden>
+    <main>
+      <section class="mission-strip" aria-label="Mission progress">
+        <div class="mission-day"><strong>DAY <span id="day-number">01</span><small> / 15</small></strong></div>
+        <div class="route"><div class="route-labels"><span>● EARTH</span><span id="phase-label">OUTBOUND TRANSIT</span><span>KEPLER ◇</span></div><div class="route-track"><div id="route-fill"></div><span id="route-ship">◆</span><i></i></div><div class="route-caption"><span id="mission-distance"></span><span id="sample-status">SAMPLES: NOT ACQUIRED</span></div></div>
+        <div class="ship-clock"><strong id="ship-time">00:00</strong><span id="time-remaining">03:00 until automatic sleep</span></div>
+        <nav class="game-actions" aria-label="Game controls"><button id="pause-button" class="button quiet" disabled>Ⅱ Pause</button><button id="sound-button" class="button quiet">♪ On</button><button id="help-button" class="button quiet">Help</button><button id="menu-button" class="button quiet">Menu</button><button id="tasks-toggle" class="button quiet" aria-expanded="false">Tasks</button></nav>
+      </section>
+      <section class="ship-systems panel" aria-label="Ship integrity and journey supplies">
+        <div class="system-cell"><span>SHIP <b id="ship-health-value">100%</b></span><div class="system-track"><i id="ship-health-fill"></i></div><small>Repair: +50 / 60s</small></div>
+        <div class="system-cell"><span>FOOD <b id="food-stock">12 / 12</b></span><span>WATER <b id="water-stock">12 / 12</b></span></div>
+        <div class="system-cell"><span>WASTE <b id="waste-value">0%</b></span><div class="system-track waste-track"><i id="waste-fill"></i></div><small id="waste-status">Warning at 80%</small></div>
+        <div class="system-cell"><span id="oxygen-status">O₂ CHECK REQUIRED</span><small>Missed check: −30 ship<br>Missed toilet: −30 health</small></div>
+      </section>
+      <div class="dashboard">
+        <aside class="panel vitals-panel" aria-label="Astronaut vitals"><div id="vitals" class="vitals"></div><p id="vital-message" hidden></p></aside>
+        <section class="map-panel panel">
+          <div class="panel-heading"><h2><span class="live-dot"></span> ASTRID <span class="muted">/ DECK 01</span></h2><span class="map-view">LIVE INTERIOR</span></div>
+          <div class="canvas-wrap" id="canvas-wrap"><canvas id="ship-canvas" aria-label="Low-poly 3D spacecraft. Hold E near a station to interact."></canvas><div id="map-labels" class="map-labels"></div><div class="map-coordinates"><span id="coordinates"></span></div><div id="emergency-banner" class="emergency-banner" hidden role="alert"></div><div class="deck-badge"><span class="live-dot"></span> <span id="deck-status">O₂ STABLE</span></div><div id="interaction" class="interaction" hidden><div><kbd>E</kbd><span id="interaction-label"></span></div><div class="interaction-track"><i id="interaction-progress"></i></div></div></div>
+          <div class="map-footer"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / ARROWS <span class="muted">move</span></span><span><kbd>E</kbd> <span class="muted">hold to interact</span></span><span><kbd>ESC</kbd> <span class="muted">pause</span></span></div>
+          <div class="touch-controls"><div class="dpad"><button data-move="up" aria-label="Move up">▲</button><button data-move="left" aria-label="Move left">◀</button><button data-move="down" aria-label="Move down">▼</button><button data-move="right" aria-label="Move right">▶</button></div><button id="touch-interact" class="button">HOLD E</button></div>
+        </section>
+        <aside class="panel tasks-panel"><div class="panel-heading"><h2>Daily checks</h2><span id="task-count" class="count">0 / 5</span></div><div id="task-list"></div><div class="optional-care"><h3>OPTIONAL CARE</h3><p id="care-status"></p></div><div class="priority-card"><span class="eyebrow">◆ MISSION</span><h3 id="objective-title"></h3><p id="objective-description"></p><span id="sleep-status"></span></div></aside>
+      </div>
+      <section class="panel log-panel" aria-label="Latest transmission"><ol id="log-list" aria-live="polite"></ol></section>
+    </main>
+  </div>
+  <div id="modal" class="modal-backdrop" hidden><section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title"><span id="modal-eyebrow" class="eyebrow">MISSION CONTROL</span><h1 id="modal-title"></h1><p id="modal-description"></p><div id="modal-content"></div><div id="modal-actions" class="modal-actions"></div></section></div>
+</body>
+</html>
